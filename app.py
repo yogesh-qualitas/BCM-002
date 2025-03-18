@@ -2,7 +2,7 @@ import csv
 import os
 from PIL import Image, ImageTk
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, Toplevel
 
 class BusinessCardManager:
     def __init__(self, root):
@@ -63,8 +63,29 @@ class BusinessCardManager:
         with open(self.filename, mode='r') as file:
             reader = csv.reader(file)
             next(reader)  # Skip header
-            for row in reader:
+            self.cards = list(reader)
+            for i, row in enumerate(self.cards):
                 self.listbox.insert(tk.END, f"{row[0]} - {row[1]}")
+    
+    def show_card_details(self, event):
+        selection = self.listbox.curselection()
+        if selection:
+            index = selection[0]
+            card = self.cards[index]
+            
+            details_window = Toplevel(self.root)
+            details_window.title("Business Card Details")
+            
+            text_info = f"Name: {card[0]}\nOrganization: {card[1]}\nCompany: {card[2]}\nEmail: {card[3]}\nPhone: {card[4]}\nAddress: {card[5]}"
+            tk.Label(details_window, text=text_info, justify=tk.LEFT, padx=10, pady=10).pack()
+            
+            if card[6]:
+                img = Image.open(card[6])
+                img = img.resize((250, 150))
+                img = ImageTk.PhotoImage(img)
+                panel = tk.Label(details_window, image=img)
+                panel.image = img
+                panel.pack()
     
     def create_widgets(self):
         tk.Label(self.root, text="Name:").grid(row=0, column=0, padx=10, pady=5)
@@ -102,6 +123,7 @@ class BusinessCardManager:
         tk.Label(self.root, text="Saved Business Cards:").grid(row=8, column=0, padx=10, pady=5)
         self.listbox = tk.Listbox(self.root, width=50, height=10)
         self.listbox.grid(row=9, column=0, columnspan=3, padx=10, pady=5)
+        self.listbox.bind("<Double-Button-1>", self.show_card_details)
         
         tk.Button(self.root, text="View All Cards", command=self.view_cards).grid(row=10, column=0, columnspan=3, pady=10)
 
