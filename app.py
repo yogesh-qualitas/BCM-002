@@ -1,6 +1,6 @@
 import csv
 import os
-from PIL import Image
+from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
@@ -57,7 +57,15 @@ class BusinessCardManager:
         self.phone_var.set("")
         self.address_var.set("")
         self.image_path.set("")
-
+    
+    def view_cards(self):
+        self.listbox.delete(0, tk.END)
+        with open(self.filename, mode='r') as file:
+            reader = csv.reader(file)
+            next(reader)  # Skip header
+            for row in reader:
+                self.listbox.insert(tk.END, f"{row[0]} - {row[1]}")
+    
     def create_widgets(self):
         tk.Label(self.root, text="Name:").grid(row=0, column=0, padx=10, pady=5)
         self.name_var = tk.StringVar()
@@ -90,6 +98,12 @@ class BusinessCardManager:
         
         tk.Button(self.root, text="Add Business Card", command=self.add_card).grid(row=7, column=0, columnspan=2, pady=10)
         tk.Button(self.root, text="Clear Fields", command=self.clear_fields).grid(row=7, column=2, pady=10)
+        
+        tk.Label(self.root, text="Saved Business Cards:").grid(row=8, column=0, padx=10, pady=5)
+        self.listbox = tk.Listbox(self.root, width=50, height=10)
+        self.listbox.grid(row=9, column=0, columnspan=3, padx=10, pady=5)
+        
+        tk.Button(self.root, text="View All Cards", command=self.view_cards).grid(row=10, column=0, columnspan=3, pady=10)
 
 if __name__ == "__main__":
     root = tk.Tk()
